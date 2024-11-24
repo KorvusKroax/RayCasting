@@ -55,8 +55,11 @@ class Engine
 
         void render()
         {
-            renderWalls();
-            renderRotatedViewpoint();
+            // renderWalls();
+            // renderRotatedViewpoint();
+
+            renderRotatedWalls();
+            renderViewpoint();
         }
 
         void renderWalls()
@@ -69,6 +72,32 @@ class Engine
                 start.y += (openGL->canvas->height >> 1);
                 end.x += (openGL->canvas->width >> 1);
                 end.y += (openGL->canvas->height >> 1);
+
+                openGL->canvas->drawLine(start.x, start.y, end.x, end.y, ColorRGBA(128, 128, 128));
+            }
+        }
+
+        void renderViewpoint()
+        {
+            float x = openGL->canvas->width >> 1;
+            float y = openGL->canvas->height >> 1;
+            float dirX = sin(0) * 10;
+            float dirY = cos(0) * 10;
+
+            openGL->canvas->drawFilledCircle(x, y, 2, ColorRGBA(255, 0, 0));
+            openGL->canvas->drawLine(x, y, x + dirX, y + dirY, ColorRGBA(255, 128, 128));
+        }
+
+        void renderRotatedWalls()
+        {
+            for (Wall wall : world.walls) {
+                Point start = world.points[wall.start].rotate(viewpoint.pos, viewpoint.heading);
+                Point end = world.points[wall.end].rotate(viewpoint.pos, viewpoint.heading);
+
+                start.x += (openGL->canvas->width >> 1) - viewpoint.pos.x;
+                start.y += (openGL->canvas->height >> 1) - viewpoint.pos.y;
+                end.x += (openGL->canvas->width >> 1) - viewpoint.pos.x;
+                end.y += (openGL->canvas->height >> 1) - viewpoint.pos.y;
 
                 openGL->canvas->drawLine(start.x, start.y, end.x, end.y, ColorRGBA(128, 128, 128));
             }
