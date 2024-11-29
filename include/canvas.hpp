@@ -385,6 +385,47 @@ class Canvas
             delete[] next;
         }
 
+        int cross(int x1, int y1, int x2, int y2, int x, int y)
+        {
+            return (x2 - x1) * (y - y1) - (y2 - y1) * (x - x1);
+            // n > 0: p is left
+            // n = 0: p is on line
+            // n < 0: p is right
+        }
+
+        bool pointInTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int x, int y)//, bool withBias = false)
+        {
+            return
+                cross(x1, y1, x2, y2, x, y) <= 0 && // + (!withBias || (y2 - y1 < 0 || (y2 - y1 == 0 && x2 - x1 > 0)) ? 0 : -1) <= 0 &&
+                cross(x2, y2, x3, y3, x, y) <= 0 && // + (!withBias || (y3 - y2 < 0 || (y3 - y2 == 0 && x3 - x2 > 0)) ? 0 : -1) <= 0 &&
+                cross(x3, y3, x1, y1, x, y) <= 0;   // + (!withBias || (y1 - y3 < 0 || (y1 - y3 == 0 && x1 - x3 > 0)) ? 0 : -1) <= 0;
+        }
+
+        void drawFilledTriangle(int x1, int y1, int x2, int y2, int x3, int y3, ColorRGBA color)//, bool withBias = false)
+        {
+            float minX = x1;
+            if (minX > x2) minX = x2;
+            if (minX > x3) minX = x3;
+            float minY = y1;
+            if (minY > y2) minY = y2;
+            if (minY > y3) minY = y3;
+
+            float maxX = x1;
+            if (maxX < x2) maxX = x2;
+            if (maxX < x3) maxX = x3;
+            float maxY = y1;
+            if (maxY < y2) maxY = y2;
+            if (maxY < y3) maxY = y3;
+
+            for (int x = minX; x < maxX; x++) {
+                for (int y = minY; y < maxY; y++) {
+                    if (pointInTriangle(x1, y1, x2, y2, x3, y3, x, y)) {//, withBias)) {
+                        setPixel(x, y, color);
+                    }
+                }
+            }
+        }
+
         void drawImage(int x, int y, const char *fileName, bool flipImageVertically = true)
         {
             int w, h, channelCount;
