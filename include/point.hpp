@@ -27,9 +27,4 @@ struct Point
                 y * cos(angle) + x * sin(angle)
             );
         }
-
-        Point rotateAround(Point origo, float angle)
-        {
-            return Point(x, y).sub(origo).rotate(angle).add(origo);
-        }
 };

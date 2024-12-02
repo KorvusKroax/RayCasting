@@ -86,14 +86,14 @@ class Engine
         {
             for (Wall wall : world.walls) {
                 Point start = world.points[wall.start]
-                    .rotateAround(viewpoint.pos, viewpoint.heading)
-                    .add(Point(openGL->canvas->width >> 1, openGL->canvas->height >> 1))
-                    .sub(viewpoint.pos);
+                    .sub(viewpoint.pos)
+                    .rotate(viewpoint.heading)
+                    .add(Point(openGL->canvas->width >> 1, openGL->canvas->height >> 1));
 
                 Point end = world.points[wall.end]
-                    .rotateAround(viewpoint.pos, viewpoint.heading)
-                    .add(Point(openGL->canvas->width >> 1, openGL->canvas->height >> 1))
-                    .sub(viewpoint.pos);
+                    .sub(viewpoint.pos)
+                    .rotate(viewpoint.heading)
+                    .add(Point(openGL->canvas->width >> 1, openGL->canvas->height >> 1));
 
                 openGL->canvas->drawLine(start.x, start.y, end.x, end.y, ColorRGBA(0, 128, 0));
             }
@@ -108,7 +108,6 @@ class Engine
         void render3DView()
         {
             for (Wall wall : world.walls) {
-
                 Point start = world.points[wall.start]
                     .sub(viewpoint.pos)
                     .rotate(viewpoint.heading);
