@@ -10,14 +10,26 @@ struct Point
             this->y = y;
         }
 
-        Point rotate(Point origo, float angle)
+        Point add(Point p)
         {
-            float x = this->x - origo.x;
-            float y = this->y - origo.y;
+            return Point(x + p.x, y + p.y);
+        }
 
+        Point sub(Point p)
+        {
+            return Point(x - p.x, y - p.y);
+        }
+
+        Point rotate(float angle)
+        {
             return Point(
-                origo.x + (x * cos(angle) - y * sin(angle)),
-                origo.y + (y * cos(angle) + x * sin(angle))
+                x * cos(angle) - y * sin(angle),
+                y * cos(angle) + x * sin(angle)
             );
+        }
+
+        Point rotateAround(Point origo, float angle)
+        {
+            return Point(x, y).sub(origo).rotate(angle).add(origo);
         }
 };

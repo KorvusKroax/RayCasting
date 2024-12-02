@@ -7,12 +7,12 @@ class World
 {
     public:
         Point points[2] =  {
-            Point(-63.0f, 25.0f),
-            Point(64.0f, 35.0f),
+            Point(-50, 80),
+            Point( 50, 80),
         };
 
         Wall walls[1] = {
-            Wall(0, 1, 128.0f),
+            Wall(0, 1, 50),
         };
 
         World() { }
