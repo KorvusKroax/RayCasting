@@ -12,7 +12,7 @@
                 "-std=c++17",
                 "-I./include",
                 "-L./lib",
-                "src/glad.c",
+                "include/openGL/glad/glad.c",
                 "-lglfw3dll",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}.exe",

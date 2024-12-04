@@ -105,8 +105,7 @@ class Engine
             openGL->canvas->drawLine(x, y, x, y + 10, ColorRGBA(0, 128, 0));
         }
 
-
-
+/*
         // Returns 1 if the lines intersect, otherwise 0. In addition, if the lines
         // intersect the intersection point may be stored in the floats i_x and i_y.
         char get_line_intersection(float p0_x, float p0_y, float p1_x, float p1_y,
@@ -132,9 +131,53 @@ class Engine
 
             return 0; // No collision
         }
+*/
+
+        char lineIntersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, float *px = 0, float *py = 0)
+        {
+            float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+            float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+            float u = -(((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den);
+
+            *px = x1 + t * (x2 - x1);
+            *py = y1 + t * (y2 - y1);
+
+            if (0 <= t && t <= 1 && 0 <= u && u <= 1) {
+                return 3; // crossing on both line
+            }
+            if (0 <= u && u <= 1) {
+                return 2; // crossing on second line only
+            }
+            if (0 <= t && t <= 1) {
+                return 1; // crossing on first line only
+            }
+            return 0; // no crossing
+        }
+
+        char rayIntersection(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4, float *px = 0, float *py = 0)
+        {
+            float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+            float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+
+            *px = x1 + t * (x2 - x1);
+            *py = y1 + t * (y2 - y1);
+
+            if (0 <= t && t <= 1) {
+                float u = -(((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den);
+                if (0 <= u) {
+                    return 1; // ray hit the line
+                }
+            }
+            return 0; // no crossing
+        }
 
         void renderView_wireframe()
         {
+            float fov_x1 = sin(-fov * .5f) * 10;
+            float fov_y1 = cos(-fov * .5f) * 10;
+            float fov_x2 = sin(fov * .5f) * 10;
+            float fov_y2 = cos(fov * .5f) * 10;
+
             for (Wall wall : world.walls) {
                 Point start = world.points[wall.start]
                     .sub(viewpoint.pos)
@@ -143,6 +186,16 @@ class Engine
                 Point end = world.points[wall.end]
                     .sub(viewpoint.pos)
                     .rotate(viewpoint.heading);
+
+                float x, y;
+                if (rayIntersection(start.x, start.y, end.x, end.y, 0, 0, fov_x1, fov_y1, &x, &y)) {
+                    start.x = x;
+                    start.y = y;
+                }
+                if (rayIntersection(start.x, start.y, end.x, end.y, 0, 0, fov_x2, fov_y2, &x, &y)) {
+                    end.x = x;
+                    end.y = y;
+                }
 
                 float x1 = aspectRatio * this->f * start.x;
                 float y1 = this->f * (wall.top - viewpoint.height);
