@@ -3,7 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <stb_image.h>
-#include <canvas.hpp>
+#include <canvas.h>
 #include <iostream>
 
 class SpriteSheet

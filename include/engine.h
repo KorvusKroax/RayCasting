@@ -1,8 +1,8 @@
 #pragma once
 
-#include <openGL/open_gl.hpp>
-#include <world.hpp>
-#include <viewpoint.hpp>
+#include <openGL/open_gl.h>
+#include <world.h>
+#include <viewpoint.h>
 
 const double pi = 3.14159265358979323846; //3.141592653589793238462643383279502884197169399375105820974944;
 const double mouseSensivity = 0.0025;
@@ -105,7 +105,35 @@ class Engine
             openGL->canvas->drawLine(x, y, x, y + 10, ColorRGBA(0, 128, 0));
         }
 
-        void render3DView()
+
+
+        // Returns 1 if the lines intersect, otherwise 0. In addition, if the lines
+        // intersect the intersection point may be stored in the floats i_x and i_y.
+        char get_line_intersection(float p0_x, float p0_y, float p1_x, float p1_y,
+            float p2_x, float p2_y, float p3_x, float p3_y, float *i_x, float *i_y)
+        {
+            float s1_x, s1_y, s2_x, s2_y;
+            s1_x = p1_x - p0_x;     s1_y = p1_y - p0_y;
+            s2_x = p3_x - p2_x;     s2_y = p3_y - p2_y;
+
+            float s, t;
+            s = (-s1_y * (p0_x - p2_x) + s1_x * (p0_y - p2_y)) / (-s2_x * s1_y + s1_x * s2_y);
+            t = ( s2_x * (p0_y - p2_y) - s2_y * (p0_x - p2_x)) / (-s2_x * s1_y + s1_x * s2_y);
+
+            if (s >= 0 && s <= 1 && t >= 0 && t <= 1)
+            {
+                // Collision detected
+                if (i_x != NULL)
+                    *i_x = p0_x + (t * s1_x);
+                if (i_y != NULL)
+                    *i_y = p0_y + (t * s1_y);
+                return 1;
+            }
+
+            return 0; // No collision
+        }
+
+        void renderView_wireframe()
         {
             for (Wall wall : world.walls) {
                 Point start = world.points[wall.start]
@@ -116,28 +144,26 @@ class Engine
                     .sub(viewpoint.pos)
                     .rotate(viewpoint.heading);
 
-                float height = wall.height;
-
                 float x1 = aspectRatio * this->f * start.x;
-                float y1 = this->f * (height - viewpoint.height);
+                float y1 = this->f * (wall.top - viewpoint.height);
                 float z1 = start.y * this->q - zNear * this->q;
                 float sx1 = (x1 / z1 + 1) * (openGL->canvas->width >> 1);
                 float sy1 = (y1 / z1 + 1) * (openGL->canvas->height >> 1);
 
                 float x2 = aspectRatio * this->f * end.x;
-                float y2 = this->f * (height - viewpoint.height);
+                float y2 = this->f * (wall.top - viewpoint.height);
                 float z2 = end.y * this->q - zNear * this->q;
                 float sx2 = (x2 / z2 + 1) * (openGL->canvas->width >> 1);
                 float sy2 = (y2 / z2 + 1) * (openGL->canvas->height >> 1);
 
                 float x3 = aspectRatio * this->f * end.x;
-                float y3 = this->f * -viewpoint.height;
+                float y3 = this->f * (wall.bottom - viewpoint.height);
                 float z3 = end.y * this->q - zNear * this->q;
                 float sx3 = (x3 / z3 + 1) * (openGL->canvas->width >> 1);
                 float sy3 = (y3 / z3 + 1) * (openGL->canvas->height >> 1);
 
                 float x4 = aspectRatio * this->f * start.x;
-                float y4 = this->f * -viewpoint.height;
+                float y4 = this->f * (wall.bottom - viewpoint.height);
                 float z4 = start.y * this->q - zNear * this->q;
                 float sx4 = (x4 / z4 + 1) * (openGL->canvas->width >> 1);
                 float sy4 = (y4 / z4 + 1) * (openGL->canvas->height >> 1);

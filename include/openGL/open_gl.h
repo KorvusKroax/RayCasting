@@ -2,8 +2,8 @@
 
 #include <openGL/glad/glad.h>
 #include <openGL/GLFW/glfw3.h>
-#include <openGL/shader.hpp>
-#include <canvas.hpp>
+#include <openGL/shader.h>
+#include <canvas.h>
 
 enum ScreenMode {
     WINDOWED,
@@ -145,7 +145,7 @@ class OpenGL
             }
 
             initQuad();
-            quadShader = new Shader("shaders/canvas.vert", "shaders/canvas.frag");
+            quadShader = new Shader("include/openGL/shaders/canvas.vert", "include/openGL/shaders/canvas.frag");
         }
 
         ~OpenGL() { terminate(); }

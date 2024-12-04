@@ -1,5 +1,5 @@
-#include <openGL/open_gl.hpp>
-#include <engine.hpp>
+#include <openGL/open_gl.h>
+#include <engine.h>
 
 int main()
 {
@@ -17,7 +17,7 @@ int main()
 
         engine.renderMap();
         engine.renderTransformedMap();
-        engine.render3DView();
+        engine.renderView_wireframe();
 
         if (glfwGetKey(openGL.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(openGL.window, true);

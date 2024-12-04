@@ -1,7 +1,7 @@
 #pragma once
 
-#include <point.hpp>
-#include <wall.hpp>
+#include <point.h>
+#include <wall.h>
 
 class World
 {
@@ -12,7 +12,7 @@ class World
         };
 
         Wall walls[1] = {
-            Wall(0, 1, 50),
+            Wall(0, 1, 0, 50),
         };
 
         World() { }
