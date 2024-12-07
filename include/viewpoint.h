@@ -5,16 +5,10 @@
 class Viewpoint
 {
     public:
-        Point pos;
-        float height;
-        float heading; // in rad
-        float speed;
+        Point pos = Point(0, 0);
+        float height = 24;
+        float heading = 0; // in rad
+        float speed = 50;
 
-        Viewpoint(float x = 0.0f, float y = 0.0f, float height = 0.0f, float heading = 0.0f, float speed = 1.0f)
-        {
-            this->pos = Point(x, y);
-            this->height = height;
-            this->heading = heading;
-            this->speed = speed;
-        }
+        Viewpoint() { }
 };

@@ -15,9 +15,10 @@ int main()
         openGL.canvas->clearCanvas();
         engine.update();
 
-        engine.renderMap();
+        // engine.renderMap();
         engine.renderTransformedMap();
-        engine.renderView_wireframe();
+        // engine.renderView_wireframe_v1();
+        engine.renderView_wireframe_v2();
 
         if (glfwGetKey(openGL.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(openGL.window, true);

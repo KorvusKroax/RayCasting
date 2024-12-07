@@ -38,30 +38,32 @@ class Canvas
 
         void setPixel(int x, int y, ColorRGBA color)
         {
-            if (x >= 0 && x < width && y >= 0 && y < height) {
-                if (color.getAlpha() == 255) {
-                    pixels[x + y * width] = color.value;
-                } else {
-                    if (color.getAlpha() == 0) {
-                        return;
-                    }
+            if (x < 0 || x >= width || y < 0 || y >= height) return;
 
-                    ColorRGBA pixel = ColorRGBA(pixels[x + y * width]);
-
-                    float weight = color.getAlpha() / 255.0f;
-
-                    int r = int(pixel.getRed()   * (1.0f - weight) + color.getRed()   * weight);
-                    int g = int(pixel.getGreen() * (1.0f - weight) + color.getGreen() * weight);
-                    int b = int(pixel.getBlue()  * (1.0f - weight) + color.getBlue()  * weight);
-                    int a = (pixel.getAlpha() + color.getAlpha()) >> 1;
-
-                    pixels[x + y * width] = ColorRGBA(r, g, b, a).value;
+            if (color.getAlpha() == 255) {
+                pixels[x + y * width] = color.value;
+            } else {
+                if (color.getAlpha() == 0) {
+                    return;
                 }
+
+                ColorRGBA pixel = ColorRGBA(pixels[x + y * width]);
+
+                float weight = color.getAlpha() / 255.0f;
+
+                int r = int(pixel.getRed()   * (1.0f - weight) + color.getRed()   * weight);
+                int g = int(pixel.getGreen() * (1.0f - weight) + color.getGreen() * weight);
+                int b = int(pixel.getBlue()  * (1.0f - weight) + color.getBlue()  * weight);
+                int a = (pixel.getAlpha() + color.getAlpha()) >> 1;
+
+                pixels[x + y * width] = ColorRGBA(r, g, b, a).value;
             }
         }
 
         void setPixels(int x, int y, Canvas *canvas)
         {
+            if ((x < 0 && x + canvas->width < 0) || (x >= width && x + canvas->width > width) || (y < 0 && y + canvas->height < 0) || (y >= height && x + canvas->height > height)) return;
+
             for (int i = 0; i < canvas->width; i++) {
                 for (int j = 0; j < canvas->height; j++) {
                     setPixel(x + i, y + j, canvas->pixels[i + j * canvas->width]);
@@ -69,33 +71,35 @@ class Canvas
             }
         }
 
-        bool getPixel(int x, int y, ColorRGBA *color)
+        bool getPixel(int x, int y, ColorRGBA *color = 0)
         {
-            if (x >= 0 && x < width && y >= 0 && y < height) {
-                *(color) = ColorRGBA(pixels[x + y * width]);
-                return true;
-            }
+            if (x < 0 || x >= width || y < 0 || y >= height) return false;
 
-            *(color) = 0;
-            return false;
+            *color = ColorRGBA(pixels[x + y * width]);
+            return true;
         }
 
-        Canvas getPixels(int x, int y, unsigned int w, unsigned int h)
+        bool getPixels(int x, int y, unsigned int w, unsigned int h, Canvas *canvas)
         {
+            canvas = new Canvas(w, h);
+
+            if ((x < 0 && x + canvas->width < 0) || (x >= width && x + canvas->width > width) || (y < 0 && y + canvas->height < 0) || (y >= height && x + canvas->height > height)) return false;
+
             ColorRGBA color;
-            Canvas canvas = Canvas(w, h);
             for (int i = 0; i < w; i++) {
                 for (int j = 0; j < h; j++) {
                     getPixel(x + i, y + j, &color);
-                    canvas.pixels[i + j * w] = color.value;
+                    canvas->pixels[i + j * w] = color.value;
                 }
             }
 
-            return canvas;
+            return true;
         }
 
         void drawRectangle(int x, int y, int w, int h, ColorRGBA color)
         {
+            if ((x < 0 && x + w < 0) || (x >= width && x + w > width) || (y < 0 && y + h < 0) || (y >= height && x + h > height)) return;
+
             for (int i = 0; i < w; i++) {
                 setPixel(x + i, y        , color);
                 setPixel(x + i, y + h - 1, color);
@@ -108,6 +112,8 @@ class Canvas
 
         void drawFilledRectangle(int x, int y, int w, int h, ColorRGBA color)
         {
+            if ((x < 0 && x + w < 0) || (x >= width && x + w > width) || (y < 0 && y + h < 0) || (y >= height && x + h > height)) return;
+
             for (int i = 0; i < h; i++) {
                 for (int j = 0; j < w; j++)  {
                     setPixel(x + j, y + i, color);
@@ -117,6 +123,8 @@ class Canvas
 
         void drawAALine(int x1, int y1, int x2, int y2, ColorRGBA color)
         {
+            if ((x1 < 0 && x2 < 0) || (x1 >= width && x2 >= width) || (y1 < 0 && y2 < 0) || (y1 >= height && y2 >= height)) return;
+
             int dx = abs(x2 - x1);
             int dy = abs(y2 - y1);
             int sx = x1 < x2 ? 1 : -1;
@@ -145,6 +153,8 @@ class Canvas
 
         void drawLine(int x1, int y1, int x2, int y2, ColorRGBA color)
         {
+            if ((x1 < 0 && x2 < 0) || (x1 >= width && x2 >= width) || (y1 < 0 && y2 < 0) || (y1 >= height && y2 >= height)) return;
+
             int dx = abs(x2 - x1);
             int dy = abs(y2 - y1);
             int sx = x1 < x2 ? 1 : -1;
@@ -232,6 +242,8 @@ class Canvas
 
         void drawMidpointCircle(int cx, int cy, int r, ColorRGBA color)
         {
+            if (cx + r < 0 || cx + r >= width || cy + r < 0 || cy + r >= height) return;
+
             int x = 0;
             int y = -r;
             int p = -r;
@@ -253,6 +265,8 @@ class Canvas
 
         void drawCircle(int cx, int cy, int r, ColorRGBA color)
         {
+            if (cx + r < 0 || cx + r >= width || cy + r < 0 || cy + r >= height) return;
+
             int x = 0;
             int y = -r;
             int p = 2 - 2 * r;
@@ -270,6 +284,8 @@ class Canvas
 
         void drawFilledCircle(int cx, int cy, int r, ColorRGBA color)
         {
+            if (cx + r < 0 || cx + r >= width || cy + r < 0 || cy + r >= height) return;
+
             int rr = r;
             int x = -r;
             int y = 0;
@@ -288,6 +304,8 @@ class Canvas
 
         void floodFill(int x, int y, ColorRGBA color)
         {
+            if (x < 0 || x >= width || y < 0 || y >= height) return;
+
             ColorRGBA targetColor, pixel;
             if (!getPixel(x, y, &targetColor) || targetColor.value == color.value) return;
 
@@ -318,6 +336,8 @@ class Canvas
 
         void spanFill(int x, int y, ColorRGBA color)
         {
+            if (x < 0 || x >= width || y < 0 || y >= height) return;
+
             ColorRGBA targetColor, pixel;
             if (!getPixel(x, y, &targetColor) || targetColor.value == color.value) return;
 
@@ -403,6 +423,8 @@ class Canvas
 
         void drawFilledTriangle(int x1, int y1, int x2, int y2, int x3, int y3, ColorRGBA color)//, bool withBias = false)
         {
+            if ((x1 < 0 && x2 < 0 && x3 < 0) || (x1 >= width && x2 >= width && x3 >= width) || (y1 < 0 && y2 < 0 && y3 < 0) || (y1 >= height && y2 >= height && y3 >= height)) return;
+
             float minX = x1;
             if (minX > x2) minX = x2;
             if (minX > x3) minX = x3;
@@ -431,6 +453,8 @@ class Canvas
             int w, h, channelCount;
             stbi_set_flip_vertically_on_load(flipImageVertically);
             unsigned char *image = stbi_load(fileName, &w, &h, &channelCount, 0);
+
+            if ((x < 0 && x + w < 0) || (x >= width && x + w > width) || (y < 0 && y + h < 0) || (y >= height && x + h > height)) return;
 
             for (int i = 0; i < w; i++) {
                 for (int j = 0; j < h; j++) {
